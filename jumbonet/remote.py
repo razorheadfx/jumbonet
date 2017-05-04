@@ -62,7 +62,9 @@ class Remote():
         p = Process(chan)
         
         p.listeners.append((listener, listen_output, listen_error, listen_status))
-        
+        p.set_args(args)
+
+
         self.processes.append(p)
         
         log.info("Started %s @ %s with UUID:%s via %s" %(command, self.name, p.uuid, p.chan))
