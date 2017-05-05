@@ -13,14 +13,18 @@ BUFFSIZE = 1024
 
 
 class Remote():
-    def __init__(self, name, remote_host, remote_user, keyfile = None, remote_password = None, port = 22):
+    def __init__(self, name, remote_host, remote_user, keyfile = None, remote_password = None, port = 22, inband_ip = None, inband_mac = None):
         self.name = name
-        self.host = remote_host
         self.user = remote_user
+        self.host = remote_host
+        self.port = port
         
         self.ssh = SSHClient()
         self.ssh.set_missing_host_key_policy(AutoAddPolicy())
         self.connected = False
+        
+        self.inband_ip = inband_ip
+        self.inband_mac = inband_mac
         
         try:
             self.ssh.connect(self.host, port, remote_user, remote_password, key_filename = keyfile, look_for_keys=True)
@@ -35,6 +39,13 @@ class Remote():
         
         self.processes = []
         
+    def IP():
+        return self.inband_ip
+        
+        
+    def MAC():
+        return self.inband_mac
+        
     
     def popen(self, args, listener, wd = None, sudo = False, listen_output = False, listen_error = True, listen_status = True):
         """
@@ -44,8 +55,6 @@ class Remote():
         """
         assert(self.connected)
         assert(len(args) > 0)
-        
-        env = {}
         
         cmd = []
         if wd is not None:
@@ -59,15 +68,14 @@ class Remote():
         chan.setblocking(0)
         
         chan.exec_command(command)
-        p = Process(chan)
+        p = Process(chan, args)
         
         p.listeners.append((listener, listen_output, listen_error, listen_status))
-        p.set_args(args)
 
 
         self.processes.append(p)
         
-        log.info("Started %s @ %s with UUID:%s via %s" %(command, self.name, p.uuid, p.chan))
+        log.debug("Started %s @ %s with UUID:%s via %s" %(command, self.name, p.uuid, p.chan))
         
         return p
     
@@ -88,11 +96,11 @@ class Remote():
                 
                 for listener, wants_output, wants_error, wants_status in process.listeners:
                     if wants_output and len(out) > 0:
-                        listener.receive_out(self.name, process.uuid, out)
+                        listener.receive_out(self.name, process.uuid, process.args, out)
                     if wants_error and len(err) > 0:
-                        listener.receive_err(self.name, process.uuid, err)
+                        listener.receive_err(self.name, process.uuid, process.args, err)
                     if wants_status and exited:
-                        listener.receive_status(self.name, process.uuid, exitcode)
+                        listener.receive_status(self.name, process.uuid, process.args, exitcode)
             
             except:
                 traceback.print_exc()
@@ -127,21 +135,19 @@ class Remote():
 
 
 class Process():
-    def __init__(self, channel):
+    def __init__(self, channel, args):
         self.uuid = uuid.uuid1().__str__()
+        self.args = args
         self.alive = True
         self.chan = channel
-        self.args = None
         self.listeners = []
         self.stdout = []
         self.stderr = []
         self.exitcode = None
-    
-    def set_args(self, args):
-        self.args = args    
-            
+        log.debug("New Process: %s as %s via %s" %(self.args, self.uuid, self.chan))
+
     def kill(self):
-        self.chan.write(signal.SIGINT)
+        self.chan.send(signal.SIGINT)
             
     def _read_stdout(self, drain):
         
@@ -198,7 +204,7 @@ class Process():
         err = self._read_stderr(exited)
         
         
-        log.info("%s:\n-- stdout:%s\n-- stderr:%s" %(self.uuid, out, err))
+        log.debug("%s:\n-- stdout:%s\n-- stderr:%s" %(self.uuid, out, err))
         
         self.stdout.extend(out)
         self.stderr.extend(err)

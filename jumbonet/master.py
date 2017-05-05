@@ -20,6 +20,7 @@ class Chief():
             raise
         
         self.remotes[name] = r
+        log.info("Connected to Remote: %s at %s:%s" %(r.name, r.host, r.port))
         return r
         
         
@@ -45,10 +46,10 @@ class Chief():
     def shutdown(self):
         self.run = False
         
-        log.info("Shutting down remotes:")
+        log.info("Disconnecting remotes")
         for remote in self.remotes.values():
-            print("-- shutting down %s" %remote.name)
             remote.shutdown()
+            log.info("-- Disconnected %s (%s:%s)" %(remote.name, remote.host, remote.port))
         
   
     def __watch_remotes(self):
@@ -61,15 +62,15 @@ class Listener():
     def __init__(self):
         pass
     
-    def receive_out(self,remotename, uuid, lines):
+    def receive_out(self, remotename, uuid, args, lines):
         for line in lines:
             print("%s:%s" %(uuid, line))
         raise NotImplementedError()
     
-    def receive_err(self,remotename, uuid, lines):
+    def receive_err(self, remotename, uuid, args, lines):
         for line in lines:
             print("%s:%s" %(uuid, line))
         raise NotImplementedError()
     
-    def receive_status(self,remotename, uuid, alive):
+    def receive_status(self, remotename, uuid, args, exitcode):
         raise NotImplementedError()
