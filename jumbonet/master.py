@@ -13,9 +13,9 @@ class Chief():
         self.remotes = {}
         self.run = False
         
-    def add_remote(self, name, host, user, keyfile = None, port = 22):
+    def add_remote(self, name, host, user, keyfile = None, port = 22, inband_ip = None, inband_mac = None, inband_interface = None):
         try:
-            r = remote.Remote(name, host, user, keyfile = keyfile, port =  port)
+            r = remote.Remote(name, host, user, keyfile = keyfile, port = port, inband_ip = inband_ip, inband_mac = inband_mac, inband_interface=inband_interface)
         except:
             raise
         

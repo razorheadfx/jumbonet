@@ -13,7 +13,7 @@ BUFFSIZE = 1024
 
 
 class Remote():
-    def __init__(self, name, remote_host, remote_user, keyfile = None, remote_password = None, port = 22, inband_ip = None, inband_mac = None):
+    def __init__(self, name, remote_host, remote_user, keyfile = None, remote_password = None, port = 22, inband_interface = None, inband_ip = None, inband_mac = None):
         self.name = name
         self.user = remote_user
         self.host = remote_host
@@ -22,7 +22,8 @@ class Remote():
         self.ssh = SSHClient()
         self.ssh.set_missing_host_key_policy(AutoAddPolicy())
         self.connected = False
-        
+
+        self.inband_interface = inband_interface
         self.inband_ip = inband_ip
         self.inband_mac = inband_mac
         
@@ -39,12 +40,15 @@ class Remote():
         
         self.processes = []
         
-    def IP():
+    def IP(self):
         return self.inband_ip
         
         
-    def MAC():
+    def MAC(self):
         return self.inband_mac
+
+    def Iface(self):
+        return self.inband_interface
         
     
     def popen(self, args, listener, wd = None, sudo = False, listen_output = False, listen_error = True, listen_status = True):
@@ -147,7 +151,7 @@ class Process():
         log.debug("New Process: %s as %s via %s" %(self.args, self.uuid, self.chan))
 
     def kill(self):
-        self.chan.send(signal.SIGINT)
+        self.chan.send(chr(3))
             
     def _read_stdout(self, drain):
         
