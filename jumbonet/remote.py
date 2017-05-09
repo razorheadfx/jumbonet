@@ -51,7 +51,7 @@ class Remote():
         return self.inband_interface
         
     
-    def popen(self, args, listener, wd = None, sudo = False, listen_output = False, listen_error = True, listen_status = True):
+    def popen(self, args, listener, wd = None, listen_output = False, listen_error = True, listen_status = True):
         """
         start a new process
         :param args a list of the command and its arguments
