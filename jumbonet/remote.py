@@ -30,6 +30,7 @@ class Remote():
         try:
             self.ssh.connect(self.host, port, remote_user, remote_password, key_filename = keyfile, look_for_keys=True)
             self.connected = True
+            self.ssh.get_transport().set_keepalive(1)
         
         except BadHostKeyException as e:
             raise
@@ -70,7 +71,8 @@ class Remote():
         
         chan = self.ssh.get_transport().open_channel("session")
         chan.setblocking(0)
-        
+        chan.get_pty()
+
         chan.exec_command(command)
         p = Process(chan, args)
         
@@ -124,6 +126,10 @@ class Remote():
         else:
             process.kill()
             return True
+
+    def killall(self):
+        for p in self.processes:
+            p.kill()
         
     def shutdown(self):
         for process in self.processes:
@@ -133,6 +139,13 @@ class Remote():
                 
             
         self.ssh.close()
+
+    def has_running_processes(self):
+        for p in self.processes:
+            if p.alive:
+                return True
+
+        return False
 
 
 
@@ -150,8 +163,11 @@ class Process():
         self.exitcode = None
         log.debug("New Process: %s as %s via %s" %(self.args, self.uuid, self.chan))
 
+    def __str__(self):
+        return "Process {!s}:{!s} alive: {!s} via {!s}, listeners: {!s}, exitcode: {!s}".format(self.uuid, self.args, self.alive, self.chan, self.listeners, self.exitcode)
+
     def kill(self):
-        self.chan.send(chr(3))
+        self.chan.close()
             
     def _read_stdout(self, drain):
         

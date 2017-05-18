@@ -56,6 +56,19 @@ class Chief():
         log.debug("Watching remotes")
         for r in self.remotes.values():
             r.check_processes()
+
+    def kill_all_processes(self):
+        for uuid, r in self.remotes.items():
+            r.killall()
+            r.check_processes()
+
+
+    def has_running_processes(self):
+        for uuid, r in self.remotes.items():
+            if r.has_running_processes():
+                return True
+
+        return False
             
 class Listener():
     
