@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='jumbonet',
-      version='0.1',
+      version='0.5',
       description='a network experiment runner',
       url='https://github.com/razorheadfx/jumbonet',
       author='razorheadfx',

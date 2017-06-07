@@ -3,17 +3,16 @@ from paramiko.ssh_exception import  SSHException, BadHostKeyException
 import logging
 import traceback
 import uuid
-import signal
 import socket
 
 log = logging.getLogger(__name__)
-
 
 BUFFSIZE = 1024
 
 
 class Remote():
-    def __init__(self, name, remote_host, remote_user, keyfile = None, remote_password = None, port = 22, inband_interface = None, inband_ip = None, inband_mac = None):
+    def __init__(self, name, remote_host, remote_user, keyfile = None, remote_password = None, \
+                 port = 22, inband_interface = None, inband_ip = None, inband_mac = None, cmd_factory = None):
         self.name = name
         self.user = remote_user
         self.host = remote_host
@@ -26,6 +25,7 @@ class Remote():
         self.inband_interface = inband_interface
         self.inband_ip = inband_ip
         self.inband_mac = inband_mac
+        self.cmds = cmd_factory
         
         try:
             self.ssh.connect(self.host, port, remote_user, remote_password, key_filename = keyfile, look_for_keys=True)
@@ -164,7 +164,7 @@ class Process():
         log.debug("New Process: %s as %s via %s" %(self.args, self.uuid, self.chan))
 
     def __str__(self):
-        return "Process {!s}:{!s} alive: {!s} via {!s}, listeners: {!s}, exitcode: {!s}".format(self.uuid, self.args, self.alive, self.chan, self.listeners, self.exitcode)
+        return "Process {}:{} alive: {} via {}, listeners: {}, exitcode: {}".format(self.uuid, self.args, self.alive, self.chan, self.listeners, self.exitcode)
 
     def kill(self):
         self.chan.close()
