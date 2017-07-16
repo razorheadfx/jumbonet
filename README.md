@@ -89,7 +89,7 @@ net.shutdown()
 For further reference check out examples/ or jumbonet/testcase, which is a versatile wrapper for more complex experiments with result post-processing on remotes and the master machine.
 
 
-### Depencies & Installation
+### Dependencies & Installation
 Dependencies  
 * Python3
 * [Paramiko](http://www.paramiko.org/)
