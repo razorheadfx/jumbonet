@@ -96,7 +96,7 @@ Dependencies
 * SSH Server on the remote bosts
   
 Install  
-```shell
+```bash
 python3 setup.py install
 # should install paramiko through pip if necessary
 # or run python3 setup.py develop to just link to the repo location (recommended for the examples)
@@ -106,18 +106,18 @@ python3 setup.py install
 ### Known Issues / Common Errors
 
 ##### SSHD Session Limits
-Most SSH Servers have a default limit on the number of concurrent ssh sessions they allow, e.g. 10 with OpenSSH on Ubuntu 14.04.  
+Most SSH Servers have a default limit on the number of concurrent ssh sessions they allow, e.g. 10 with stock OpenSSH on Ubuntu 14.04.  
 Running many commands against one such remote will yield errors like this:
-´´´
+```
 ...
 paramiko.transport: secsh channel 11 opened.
 paramiko.transport: [chan 11] EOF received (11)
 paramiko.transport: [chan 11] EOF sent (11)
 ...
-´´´
+```
 This can be fixed by setting/adding _MaxSessions_ in /etc/ssh/sshd_config to a higher value.
 
  
 ### TODOS
-- [ ] add something of a debug-gui (maybe based on the GUI Example) to the master or testcase
+- [ ] add something of a minimal debug-gui (maybe based on the GUI Example) to master or testcase
 - [ ] revise the remote.popen  (it's a little verbose)
