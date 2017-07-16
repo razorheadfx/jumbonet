@@ -35,17 +35,18 @@ class Master():
         return r
 
     def addHost(self, name, ip, mac, **kwargs):
-        """the mininet-friendly variant, requires default_keyfile, default_user, default_inband_interface on to be set"""
+        """the mininet-friendly variant, requires default_keyfile, default_user to be set"""
 
+        keyfile = kwargs.get("keyfile", self.default_keyfile)
         remote_host = kwargs.get("remote_host")
-        remote_user = kwargs.get("remote_user", default=self.default_user)
-        inband_iface = kwargs.get("inband_iface", default=self.default_inband_interface)
+        remote_user = kwargs.get("remote_user", self.default_user)
+        inband_iface = kwargs.get("inband_iface", self.default_inband_interface)
 
         if remote_host is None:
             raise Exception("No remote_host provided")
 
-        return self.add_remote(name, remote_host, remote_user, keyfile = self.default_keyfile, port = 22, \
-                               inband_ip=ip, inband_mac=mac, inband_iface=self.default_inband_interface)
+        return self.add_remote(name, remote_host, remote_user, keyfile = keyfile, port = 22, \
+                               inband_ip=ip, inband_mac=mac, inband_iface=inband_iface)
 
         
     def mainloop(self):        
@@ -66,7 +67,10 @@ class Master():
                 traceback.print_exc()
 
         
-    
+    def stop(self):
+        """the mininet-friendly variant"""
+        self.shutdown()
+
     def shutdown(self):
         self.run = False
         
