@@ -15,7 +15,7 @@ Check out the examples to learn more.
 ### Comparison of Jumbonet & Mininet
 Consider the following excerpt from a low-level mininet script.  
   
-```python2
+```python
 ...
 
 net = Mininet( topo=None, build=False, ipBase='10.0.0.0/8')
@@ -44,7 +44,7 @@ net.stop()
 ```
   
 The same in jumbonet:
-```python3
+```python
 
 from jumbonet import master
 
@@ -96,7 +96,7 @@ Dependencies
 * SSH Server on the remote bosts
   
 Install  
-```
+```shell
 python3 setup.py install
 # should install paramiko through pip if necessary
 # or run python3 setup.py develop to just link to the repo location (recommended for the examples)
