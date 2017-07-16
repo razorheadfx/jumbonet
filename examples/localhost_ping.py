@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import logging
 from jumbonet import testcase
 import getpass
